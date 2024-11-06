@@ -197,3 +197,8 @@ bootfun <- function(data,dtms) {
 
   save(list=c("men_res","women_res"),
        file="Results/first_results.Rda")
+  
+  library(writexl)
+  
+  write_xlsx(men_res, "Results/first_results_men.xlsx")
+  write_xlsx(women_res, "Results/first_results_women.xlsx")
