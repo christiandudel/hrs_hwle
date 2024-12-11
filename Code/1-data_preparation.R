@@ -34,8 +34,10 @@
                        starts_with("r")&ends_with("iwstat"),
                        # Age in years at interview month
                        starts_with("r")&ends_with("agey_e")&!contains("respagey"),
-                       # Sum of (i)ADL responses
-                       starts_with("r")&ends_with("adl5a"),
+                       # Sum of mobility difficulties
+                       starts_with("r")&ends_with("mobila"),
+                       # Sum of large muscle difficulties
+                       starts_with("r")&ends_with("lgmusa"),
                        # Labor force status
                        starts_with("r")&ends_with("lbrf")&!contains("inlbrf")
                        )
@@ -71,8 +73,8 @@
   hrs <- hrs |> rename_with(~paste0("r",1:15,"age"),ends_with("agey_e"))
 
   # Empty vars for reshaping later (required by reshape function)
-  hrs$r1adl5a <- NA
-  hrs$r1iadl5a <- NA
+  hrs$r1mobila <- NA
+  hrs$r1lgmusa <- NA
 
   # Change format of time varying variables (not a great solution, but works)
   hrsnames <- str_split_fixed(names(hrs),"r[[:digit:]]{1,2}",2)
@@ -160,51 +162,41 @@
       c("unemployed","inactive")~"not working",
       .default=workstatus)) 
   
-  # ADL, iADL, self-rated health (1=unhealthy/disabled)
-  hrs <- hrs |> mutate(adl=case_match(adl5a,
+  # Mobility, large muscle, both combined
+  hrs <- hrs |> mutate(mobility=case_match(mobila,
                                       0~0,
                                       1:5~1),
-                       iadl=case_match(iadl5a,
+                       muscle=case_match(lgmusa,
                                        0~0,
-                                       1:5~1))
+                                       1:4~1),
+                       both=ifelse(mobility%in%1 | muscle %in%1, 1, 0))
+  
+  # Get missings right
+  hrs <- hrs |> mutate(both=ifelse(is.na(mobility)|is.na(muscle), NA, both))
   
   
 ### Work & disability/health (combined) ########################################
   
   # Work and ADL
-  hrs <- hrs |> mutate(workadl=NA,
-                       workadl=ifelse(worksimple=="working" & adl==0,"working/healthy",workadl),
-                       workadl=ifelse(worksimple=="working" & adl==1,"working/unhealthy",workadl),
-                       workadl=ifelse(worksimple=="retired" & adl==0,"retired/healthy",workadl),
-                       workadl=ifelse(worksimple=="retired" & adl==1,"retired/unhealthy",workadl),
-                       workadl=ifelse(worksimple=="not working" ,"not working",workadl))
-  
-  # Work and iADL
-  hrs <- hrs |> mutate(workiadl=NA,
-                       workiadl=ifelse(worksimple=="working" & iadl==0,"working/healthy",workiadl),
-                       workiadl=ifelse(worksimple=="working" & iadl==1,"working/unhealthy",workiadl),
-                       workiadl=ifelse(worksimple=="retired" & iadl==0,"retired/healthy",workiadl),
-                       workiadl=ifelse(worksimple=="retired" & iadl==1,"retired/unhealthy",workiadl),
-                       workiadl=ifelse(worksimple=="not working" ,"not working",workiadl))
+  hrs <- hrs |> mutate(workboth=NA,
+                       workboth=ifelse(worksimple=="working" & both==0,"working/healthy",workboth),
+                       workboth=ifelse(worksimple=="working" & both==1,"working/unhealthy",workboth),
+                       workboth=ifelse(worksimple=="retired" & both==0,"retired/healthy",workboth),
+                       workboth=ifelse(worksimple=="retired" & both==1,"retired/unhealthy",workboth),
+                       workboth=ifelse(worksimple=="not working" ,"not working",workboth))
 
-  
 ### State variables (including death) ##########################################
   
   # State using ADL
-  hrs <- hrs |> mutate(state_adl=NA,
-                       state_adl=ifelse(iwstat==1,workadl,state_adl),
-                       state_adl=ifelse(iwstat==5,"dead",state_adl))
-  
-  # State using iADL
-  hrs <- hrs |> mutate(state_iadl=NA,
-                       state_iadl=ifelse(iwstat==1,workiadl,state_iadl),
-                       state_iadl=ifelse(iwstat==5,"dead",state_iadl))
+  hrs <- hrs |> mutate(stateboth=NA,
+                       stateboth=ifelse(iwstat==1,workboth,stateboth),
+                       stateboth=ifelse(iwstat==5,"dead",stateboth))
 
   
 ### Limit data #################################################################
 
   # Limit variables
-  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,state_adl,state_iadl)
+  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth)
 
   # Rename
   hrs <- hrs |> rename('gender'='ragender',

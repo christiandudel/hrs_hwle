@@ -30,7 +30,7 @@
                          dtms=hrsdtms,
                          idvar="id",
                          timevar="age",
-                         statevar="state_adl",
+                         statevar="stateboth",
                          steplength=TRUE)
 
   # Clean
@@ -196,9 +196,9 @@ bootfun <- function(data,dtms) {
 ### Save results ###############################################################
 
   save(list=c("men_res","women_res"),
-       file="Results/first_results.Rda")
+       file="Results/results.Rda")
   
   library(writexl)
   
-  write_xlsx(men_res, "Results/first_results_men.xlsx")
-  write_xlsx(women_res, "Results/first_results_women.xlsx")
+  write_xlsx(men_res, "Results/results_men.xlsx")
+  write_xlsx(women_res, "Results/results_women.xlsx")
