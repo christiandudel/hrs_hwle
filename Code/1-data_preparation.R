@@ -151,16 +151,16 @@
   
   # Employment (slightly more detailed/simplified)
   hrs <- hrs |> mutate(workstatus=case_match(
-    lbrf,
-    1:2~"working",
-    3  ~"unemployed",
-    4:5~"retired",
-    6:7~"inactive"),
-    workstatus=ifelse(lbrf%in%6:7&age>=state_pension,"retired",workstatus),
-    worksimple=case_match(
-      workstatus,
-      c("unemployed","inactive")~"not working",
-      .default=workstatus)) 
+                          lbrf,
+                          1:2~"working",
+                          3  ~"unemployed",
+                          4:5~"retired",
+                          6:7~"inactive"),
+                        workstatus=ifelse(lbrf%in%6:7&age>=state_pension,"retired",workstatus),
+                        worksimple=case_match(
+                          workstatus,
+                          c("unemployed","inactive")~"not working",
+                          .default=workstatus)) 
   
   # Mobility, large muscle, both combined
   hrs <- hrs |> mutate(mobility=case_match(mobila,
@@ -177,13 +177,13 @@
   
 ### Work & disability/health (combined) ########################################
   
-  # Work and ADL
+  # Work and limitations
   hrs <- hrs |> mutate(workboth=NA,
-                       workboth=ifelse(worksimple=="working" & both==0,"working/healthy",workboth),
-                       workboth=ifelse(worksimple=="working" & both==1,"working/unhealthy",workboth),
-                       workboth=ifelse(worksimple=="retired" & both==0,"retired/healthy",workboth),
-                       workboth=ifelse(worksimple=="retired" & both==1,"retired/unhealthy",workboth),
-                       workboth=ifelse(worksimple=="not working" ,"not working",workboth))
+                       workboth=ifelse(worksimple%in%"working" & both%in%0,"working/healthy",workboth),
+                       workboth=ifelse(worksimple%in%"working" & both%in%1,"working/unhealthy",workboth),
+                       workboth=ifelse(worksimple%in%"retired" & both%in%0,"retired/healthy",workboth),
+                       workboth=ifelse(worksimple%in%"retired" & both%in%1,"retired/unhealthy",workboth),
+                       workboth=ifelse(worksimple%in%"not working" & !is.na(both) ,"not working",workboth))
 
 ### State variables (including death) ##########################################
   
