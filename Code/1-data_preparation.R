@@ -175,7 +175,7 @@
   hrs <- hrs |> mutate(both=ifelse(is.na(mobility)|is.na(muscle), NA, both))
   
   
-### Work & disability/health (combined) ########################################
+### Work & health (combined) ###################################################
   
   # Work and limitations
   hrs <- hrs |> mutate(workboth=NA,
