@@ -40,7 +40,7 @@
   estdata$time2 <- estdata$time^2
   estdata$education <- as.factor(estdata$education)
   estdata$race <- as.factor(estdata$race)
-
+  
 
 ### Subsets by gender ##########################################################
 
@@ -119,14 +119,26 @@ bootfun <- function(data,dtms) {
   cat(".")
   
   # Split data
-  #first <- data |> filter(wave%in%1:8)
+  first <- data |> filter(wave%in%2:8)
   secon <- data |> filter(wave%in%9:15)
   
   # Model
-  #fit1 <- dtms_fit(data=first,controls=controls)
+  fit1 <- dtms_fit(data=first,controls=controls,package="mclogit")
   fit2 <- dtms_fit(data=secon,controls=controls,package="mclogit")
 
   # Predict probabilities
+  probs1_low_w <- dtms_transitions(dtms=dtms,model=fit1,controls=low_w,se=F)
+  probs1_med_w <- dtms_transitions(dtms=dtms,model=fit1,controls=med_w,se=F)
+  probs1_hig_w <- dtms_transitions(dtms=dtms,model=fit1,controls=hig_w,se=F)
+  
+  probs1_low_b <- dtms_transitions(dtms=dtms,model=fit1,controls=low_b,se=F)
+  probs1_med_b <- dtms_transitions(dtms=dtms,model=fit1,controls=med_b,se=F)
+  probs1_hig_b <- dtms_transitions(dtms=dtms,model=fit1,controls=hig_b,se=F)
+  
+  probs1_low_h <- dtms_transitions(dtms=dtms,model=fit1,controls=low_h,se=F)
+  probs1_med_h <- dtms_transitions(dtms=dtms,model=fit1,controls=med_h,se=F)
+  probs1_hig_h <- dtms_transitions(dtms=dtms,model=fit1,controls=hig_h,se=F)
+
   probs2_low_w <- dtms_transitions(dtms=dtms,model=fit2,controls=low_w,se=F)
   probs2_med_w <- dtms_transitions(dtms=dtms,model=fit2,controls=med_w,se=F)
   probs2_hig_w <- dtms_transitions(dtms=dtms,model=fit2,controls=hig_w,se=F)
@@ -140,6 +152,18 @@ bootfun <- function(data,dtms) {
   probs2_hig_h <- dtms_transitions(dtms=dtms,model=fit2,controls=hig_h,se=F)
   
   # Transition matrices
+  Tm1_low_w <- dtms_matrix(dtms=dtms,probs=probs1_low_w)
+  Tm1_med_w <- dtms_matrix(dtms=dtms,probs=probs1_med_w)
+  Tm1_hig_w <- dtms_matrix(dtms=dtms,probs=probs1_hig_w)
+  
+  Tm1_low_b <- dtms_matrix(dtms=dtms,probs=probs1_low_b)
+  Tm1_med_b <- dtms_matrix(dtms=dtms,probs=probs1_med_b)
+  Tm1_hig_b <- dtms_matrix(dtms=dtms,probs=probs1_hig_b)
+  
+  Tm1_low_h <- dtms_matrix(dtms=dtms,probs=probs1_low_h)
+  Tm1_med_h <- dtms_matrix(dtms=dtms,probs=probs1_med_h)
+  Tm1_hig_h <- dtms_matrix(dtms=dtms,probs=probs1_hig_h)
+  
   Tm2_low_w <- dtms_matrix(dtms=dtms,probs=probs2_low_w)
   Tm2_med_w <- dtms_matrix(dtms=dtms,probs=probs2_med_w)
   Tm2_hig_w <- dtms_matrix(dtms=dtms,probs=probs2_hig_w)
@@ -153,6 +177,18 @@ bootfun <- function(data,dtms) {
   Tm2_hig_h <- dtms_matrix(dtms=dtms,probs=probs2_hig_h)
   
   # Starting distribution (correct, but small sample sizes) 
+  S1_low_w <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
+  S1_med_w <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
+  S1_hig_w <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
+  
+  S1_low_b <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("Black",levels=levels(estdata$race))))
+  S1_med_b <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("Black",levels=levels(estdata$race))))
+  S1_hig_b <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("Black",levels=levels(estdata$race))))
+  
+  S1_low_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("Hispan",levels=levels(estdata$race))))
+  S1_med_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("Hispan",levels=levels(estdata$race))))
+  S1_hig_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("Hispan",levels=levels(estdata$race))))
+
   S2_low_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
   S2_med_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
   S2_hig_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("White",levels=levels(estdata$race))))
@@ -165,17 +201,36 @@ bootfun <- function(data,dtms) {
   S2_med_h <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("Hispan",levels=levels(estdata$race))))
   S2_hig_h <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("Hispan",levels=levels(estdata$race))))
   
+  # Codes for below:
+  # period = 1 : waves 2 to 8 
+  # period = 2 : waves 9 to 15
+  # education = 0 : low education
+  # education = 1 : medium education
+  # education = 2 : high education
+  # race = 0 : white
+  # race = 1 : black
+  # race = 2 : hispanic
+  
   # 1: Expectancies
   resexp <- rbind(
-    data.frame(education=0,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_low_w,start_distr=S2_low_w))["AVERAGE",],
-    data.frame(education=1,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_med_w,start_distr=S2_med_w))["AVERAGE",],
-    data.frame(education=2,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_w,start_distr=S2_hig_w))["AVERAGE",],
-    data.frame(education=0,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_low_b,start_distr=S2_low_b))["AVERAGE",],
-    data.frame(education=1,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_med_b,start_distr=S2_med_b))["AVERAGE",],
-    data.frame(education=2,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_b,start_distr=S2_hig_b))["AVERAGE",],
-    data.frame(education=0,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_low_h,start_distr=S2_low_h))["AVERAGE",],
-    data.frame(education=1,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_med_h,start_distr=S2_med_h))["AVERAGE",],
-    data.frame(education=2,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_h,start_distr=S2_hig_h))["AVERAGE",]
+    data.frame(period=1,education=0,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_low_w,start_distr=S1_low_w))["AVERAGE",],
+    data.frame(period=1,education=1,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_med_w,start_distr=S1_med_w))["AVERAGE",],
+    data.frame(period=1,education=2,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_w,start_distr=S1_hig_w))["AVERAGE",],
+    data.frame(period=1,education=0,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_low_b,start_distr=S1_low_b))["AVERAGE",],
+    data.frame(period=1,education=1,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_med_b,start_distr=S1_med_b))["AVERAGE",],
+    data.frame(period=1,education=2,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_b,start_distr=S1_hig_b))["AVERAGE",],
+    data.frame(period=1,education=0,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_low_h,start_distr=S1_low_h))["AVERAGE",],
+    data.frame(period=1,education=1,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_med_h,start_distr=S1_med_h))["AVERAGE",],
+    data.frame(period=1,education=2,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_h,start_distr=S1_hig_h))["AVERAGE",],
+    data.frame(period=2,education=0,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_low_w,start_distr=S2_low_w))["AVERAGE",],
+    data.frame(period=2,education=1,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_med_w,start_distr=S2_med_w))["AVERAGE",],
+    data.frame(period=2,education=2,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_w,start_distr=S2_hig_w))["AVERAGE",],
+    data.frame(period=2,education=0,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_low_b,start_distr=S2_low_b))["AVERAGE",],
+    data.frame(period=2,education=1,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_med_b,start_distr=S2_med_b))["AVERAGE",],
+    data.frame(period=2,education=2,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_b,start_distr=S2_hig_b))["AVERAGE",],
+    data.frame(period=2,education=0,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_low_h,start_distr=S2_low_h))["AVERAGE",],
+    data.frame(period=2,education=1,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_med_h,start_distr=S2_med_h))["AVERAGE",],
+    data.frame(period=2,education=2,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_h,start_distr=S2_hig_h))["AVERAGE",]
     )
 
   # Rownames for now
@@ -193,12 +248,44 @@ bootfun <- function(data,dtms) {
   women_res <- bootfun(data=women,dtms=hrspredict)
 
 
+### Bootstrap ##################################################################  
+  
+  men_boot <- dtms_boot(data=men,
+                        fun=bootfun,
+                        dtms=hrspredict,
+                        rep=250,
+                        method="block",
+                        progres=TRUE)
+  
+  women_boot <- dtms_boot(data=women,
+                          fun=bootfun,
+                          dtms=hrspredict,
+                          rep=250,
+                          method="block",
+                          progres=TRUE)
+  
+  men_boot <- summary(men_boot)
+  women_boot <- summary(women_boot)
+  
+  
 ### Save results ###############################################################
 
-  save(list=c("men_res","women_res"),
+  save(list=c("men_res","women_res","men_boot","women_boot"),
        file="Results/results.Rda")
   
-  library(writexl)
+  # For saving as Excel
+  menlist <- c(list(men_res),men_boot)
+  womenlist <- c(list(women_res),women_boot)
   
-  write_xlsx(men_res, "Results/results_men.xlsx")
-  write_xlsx(women_res, "Results/results_women.xlsx")
+  menlist <- lapply(menlist,as.data.frame)
+  womenlist <- lapply(womenlist,as.data.frame)
+  
+  menlist[[3]]$race <- menlist[[2]]$race <- menlist[[1]]$race
+  womenlist[[3]]$race <- womenlist[[2]]$race <- womenlist[[1]]$race
+
+  library(writexl)  
+  write_xlsx(menlist, "Results/results_men.xlsx")
+  write_xlsx(womenlist, "Results/results_women.xlsx")
+  
+  # If running on workstation
+  if(Sys.info()["nodename"]%in%c("HYDRA01","HYDRA02","HYDRA11")) {rm(list=ls());gc()}
