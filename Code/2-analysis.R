@@ -212,29 +212,32 @@ bootfun <- function(data,dtms) {
   # race = 2 : hispanic
   
   # 1: Expectancies
-  resexp <- rbind(
-    data.frame(period=1,education=0,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_low_w,start_distr=S1_low_w))["AVERAGE",],
-    data.frame(period=1,education=1,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_med_w,start_distr=S1_med_w))["AVERAGE",],
-    data.frame(period=1,education=2,race="White",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_w,start_distr=S1_hig_w))["AVERAGE",],
-    data.frame(period=1,education=0,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_low_b,start_distr=S1_low_b))["AVERAGE",],
-    data.frame(period=1,education=1,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_med_b,start_distr=S1_med_b))["AVERAGE",],
-    data.frame(period=1,education=2,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_b,start_distr=S1_hig_b))["AVERAGE",],
-    data.frame(period=1,education=0,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_low_h,start_distr=S1_low_h))["AVERAGE",],
-    data.frame(period=1,education=1,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_med_h,start_distr=S1_med_h))["AVERAGE",],
-    data.frame(period=1,education=2,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm1_hig_h,start_distr=S1_hig_h))["AVERAGE",],
-    data.frame(period=2,education=0,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_low_w,start_distr=S2_low_w))["AVERAGE",],
-    data.frame(period=2,education=1,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_med_w,start_distr=S2_med_w))["AVERAGE",],
-    data.frame(period=2,education=2,race="White",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_w,start_distr=S2_hig_w))["AVERAGE",],
-    data.frame(period=2,education=0,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_low_b,start_distr=S2_low_b))["AVERAGE",],
-    data.frame(period=2,education=1,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_med_b,start_distr=S2_med_b))["AVERAGE",],
-    data.frame(period=2,education=2,race="Black",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_b,start_distr=S2_hig_b))["AVERAGE",],
-    data.frame(period=2,education=0,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_low_h,start_distr=S2_low_h))["AVERAGE",],
-    data.frame(period=2,education=1,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_med_h,start_distr=S2_med_h))["AVERAGE",],
-    data.frame(period=2,education=2,race="Hispanic",dtms_expectancy(dtms=dtms,matrix=Tm2_hig_h,start_distr=S2_hig_h))["AVERAGE",]
+  resexp <- rbind(# Race, 0=white, 1=black, 2=hispanic
+    data.frame(period=1,education=0,race=0,dtms_expectancy(dtms=dtms,matrix=Tm1_low_w,start_distr=S1_low_w))["AVERAGE",],
+    data.frame(period=1,education=1,race=0,dtms_expectancy(dtms=dtms,matrix=Tm1_med_w,start_distr=S1_med_w))["AVERAGE",],
+    data.frame(period=1,education=2,race=0,dtms_expectancy(dtms=dtms,matrix=Tm1_hig_w,start_distr=S1_hig_w))["AVERAGE",],
+    data.frame(period=1,education=0,race=1,dtms_expectancy(dtms=dtms,matrix=Tm1_low_b,start_distr=S1_low_b))["AVERAGE",],
+    data.frame(period=1,education=1,race=1,dtms_expectancy(dtms=dtms,matrix=Tm1_med_b,start_distr=S1_med_b))["AVERAGE",],
+    data.frame(period=1,education=2,race=1,dtms_expectancy(dtms=dtms,matrix=Tm1_hig_b,start_distr=S1_hig_b))["AVERAGE",],
+    data.frame(period=1,education=0,race=2,dtms_expectancy(dtms=dtms,matrix=Tm1_low_h,start_distr=S1_low_h))["AVERAGE",],
+    data.frame(period=1,education=1,race=2,dtms_expectancy(dtms=dtms,matrix=Tm1_med_h,start_distr=S1_med_h))["AVERAGE",],
+    data.frame(period=1,education=2,race=2,dtms_expectancy(dtms=dtms,matrix=Tm1_hig_h,start_distr=S1_hig_h))["AVERAGE",],
+    data.frame(period=2,education=0,race=0,dtms_expectancy(dtms=dtms,matrix=Tm2_low_w,start_distr=S2_low_w))["AVERAGE",],
+    data.frame(period=2,education=1,race=0,dtms_expectancy(dtms=dtms,matrix=Tm2_med_w,start_distr=S2_med_w))["AVERAGE",],
+    data.frame(period=2,education=2,race=0,dtms_expectancy(dtms=dtms,matrix=Tm2_hig_w,start_distr=S2_hig_w))["AVERAGE",],
+    data.frame(period=2,education=0,race=1,dtms_expectancy(dtms=dtms,matrix=Tm2_low_b,start_distr=S2_low_b))["AVERAGE",],
+    data.frame(period=2,education=1,race=1,dtms_expectancy(dtms=dtms,matrix=Tm2_med_b,start_distr=S2_med_b))["AVERAGE",],
+    data.frame(period=2,education=2,race=1,dtms_expectancy(dtms=dtms,matrix=Tm2_hig_b,start_distr=S2_hig_b))["AVERAGE",],
+    data.frame(period=2,education=0,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_low_h,start_distr=S2_low_h))["AVERAGE",],
+    data.frame(period=2,education=1,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_med_h,start_distr=S2_med_h))["AVERAGE",],
+    data.frame(period=2,education=2,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_hig_h,start_distr=S2_hig_h))["AVERAGE",]
     )
 
   # Rownames for now
   rownames(resexp) <- 1:dim(resexp)[1]
+  
+  # Type
+  resexp <- as.matrix(resexp)
 
   # Return
   return(resexp)

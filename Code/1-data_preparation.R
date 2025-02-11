@@ -187,7 +187,7 @@
 
 ### State variables (including death) ##########################################
   
-  # State using ADL
+  # State using limitation
   hrs <- hrs |> mutate(stateboth=NA,
                        stateboth=ifelse(iwstat==1,workboth,stateboth),
                        stateboth=ifelse(iwstat==5,"dead",stateboth))
