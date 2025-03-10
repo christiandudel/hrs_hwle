@@ -35,7 +35,7 @@
 
   # Clean
   estdata <- dtms_clean(data=estdata,dtms=hrsdtms)
-
+  
   # Edit/add variables
   estdata$time2 <- estdata$time^2
   estdata$education <- as.factor(estdata$education)
