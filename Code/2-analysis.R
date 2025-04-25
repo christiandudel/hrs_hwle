@@ -71,7 +71,7 @@
   # Average age in first wave
   mean(individuals$time)
   
-  # Prepare empty table
+  # Table with overall descriptives for individuals
   table_individuals <- data.frame(Variable=c(rep("Gender",2),
                                   rep("Race/ethnicity",3),
                                   rep("Education",3)))
@@ -88,6 +88,28 @@
   table_individuals$Relative <- c(table1/sum(table1),table2/sum(table2),table3/sum(table3))
   
   write_xlsx(table_individuals, "Results/table_individuals.xlsx")
+  
+  # Table combined characteristics observations and by time
+  estdata <- estdata |> mutate(Period=NA,
+                               Period=ifelse(wave%in%2:8,1,Period),
+                               Period=ifelse(wave%in%9:15,2,Period))
+  
+  table_observations <- estdata |> group_by(gender,Period,race,education) |> summarize(Count=n())
+
+  table_observations$Period <- factor(table_observations$Period,levels=c(1,2),labels=c("1994-2006","2008-2020"))
+  table_observations$gender <- factor(table_observations$gender,levels=c(1,2),labels=c("Men","Women"))
+  table_observations$race <- factor(table_observations$race,levels=c("White","Black","Hispan"),labels=c("White","Black","Hispanic"))
+  table_observations$education <- factor(table_observations$education,levels=c(0,1,2),labels=c("Low","Medium","High"))
+
+  names(table_observations) <- c("Gender","Period","Race","Education","N")
+  
+  table_observations <-  arrange(table_observations,Gender,Period,Race,Education)
+  totals <- table_observations |> group_by(Period,Gender) |> summarize(P=sum(N))
+  
+  table_observations <- table_observations |> left_join(totals)
+  tabke_observations <- table_observations |> mutate(P=N/P)
+  
+  write_xlsx(tabke_observations, "Results/table_observations.xlsx")
 
   # Transitions: absolute, relative, raw transition probability
   table_transitions <- summary(estdata)
