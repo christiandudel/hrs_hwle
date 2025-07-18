@@ -39,7 +39,11 @@
                        # Sum of large muscle difficulties
                        starts_with("r")&ends_with("lgmusa"),
                        # Labor force status
-                       starts_with("r")&ends_with("lbrf")&!contains("inlbrf")
+                       starts_with("r")&ends_with("lbrf")&!contains("inlbrf"),
+                       # Current job requires physical effort
+                       starts_with("r")&ends_with("jphys"),
+                       # Current job involves lots of stress,
+                       starts_with("r")&ends_with("jstres")
                        )
 
 

@@ -48,8 +48,14 @@
 
 ### Subsets by gender ##########################################################
 
+  # Main analysis
   men <- estdata |> filter(gender==1)
   women <- estdata |> filter(gender==2)
+  
+  # Without 2020 (note: 'wave!=14' and NOT 'wave!=15' because 'wave' here is
+  # the starting wave and wave 15 is implied)
+  men2020 <- men |> filter(wave!=14)
+  women2020 <- women |> filter(wave!=14)
 
 
 ### Sample size ################################################################
@@ -305,6 +311,26 @@
   men_res <- bootfun(data=men,dtms=hrspredict)
   women_res <- bootfun(data=women,dtms=hrspredict)
 
+  
+### Robustness check: Without 2020 #############################################
+  
+  # Results without 2020
+  men2020_res <- bootfun(data=men2020,dtms=hrspredict)
+  women2020_res <- bootfun(data=women2020,dtms=hrspredict)
+  
+  # Difference to original results
+  mendiff_res <- men_res[men_res[,1]==2,-(1:3)] - 
+                 men2020_res[men2020_res[,1]==2,-(1:3)] 
+  
+  womendiff_res <- women_res[women_res[,1]==2,-(1:3)] - 
+    women2020_res[women2020_res[,1]==2,-(1:3)] 
+  
+  # Combine
+  diff_2020 <- rbind(mendiff_res,womendiff_res)
+  diff_2020 <- cbind(men_res[,1:3],diff_2020)
+  colnames(diff_2020)[1] <- "gender"
+  diff_2020 <- as.data.frame(diff_2020)
+  
 
 ### Bootstrap ##################################################################  
   
@@ -360,6 +386,7 @@
 
   write_xlsx(menlist, "Results/results_men.xlsx")
   write_xlsx(womenlist, "Results/results_women.xlsx")
+  write_xlsx(diff_2020,"Results/without_2020.xlsx")
   
   # If running on workstation
   if(Sys.info()["nodename"]%in%c("HYDRA01","HYDRA02","HYDRA11")) {rm(list=ls());gc()}
