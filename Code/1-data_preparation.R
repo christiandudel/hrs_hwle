@@ -42,8 +42,10 @@
                        starts_with("r")&ends_with("lbrf")&!contains("inlbrf"),
                        # Current job requires physical effort
                        starts_with("r")&ends_with("jphys"),
-                       # Current job involves lots of stress,
-                       starts_with("r")&ends_with("jstres")
+                       # Current job involves lots of stress
+                       starts_with("r")&ends_with("jstres"),
+                       # Poverty
+                       starts_with("h")&ends_with("inpov")
                        )
 
 
@@ -75,6 +77,9 @@
   
   # Age
   hrs <- hrs |> rename_with(~paste0("r",1:15,"age"),ends_with("agey_e"))
+  
+  # Poverty
+  hrs <- hrs |> rename_with(~paste0("r",1:15,"inpov"),ends_with("inpov"))
 
   # Empty vars for reshaping later (required by reshape function)
   hrs$r1mobila <- NA
@@ -195,19 +200,41 @@
   hrs <- hrs |> mutate(stateboth=NA,
                        stateboth=ifelse(iwstat==1,workboth,stateboth),
                        stateboth=ifelse(iwstat==5,"dead",stateboth))
+  
+  
+
+### Recode physical, stress, poverty ###########################################
+  
+  # Physical (1=yes,0 =no)
+  hrs <- hrs |> mutate(physical=NA,
+                       physical=ifelse(jphys%in%1:2,1,physical),
+                       physical=ifelse(jphys%in%3:4,0,physical))
+  
+  # Stress (1=yes, 0=no)
+  hrs <- hrs |> mutate(stress=NA,
+                       stress=ifelse(jstres%in%1:2,1,stress),
+                       stress=ifelse(jstres%in%3:4,0,stress))
+  
+  # Poverty (1=yes, 0=no)
+  hrs <- hrs |> mutate(poverty=NA,
+                       poverty=ifelse(inpov%in%1,1,poverty),
+                       poverty=ifelse(inpov%in%0,0,poverty))
+  
+  # Any (1=yes, 0=no)
+  hrs <- hrs |> mutate(anybad=NA,
+                       anybad=ifelse(physical%in%1 | stress%in%1 | poverty%in%1,1,anybad),
+                       anybad=ifelse(physical%in%0 & stress%in%0 & poverty%in%0,0,anybad))
 
   
 ### Limit data #################################################################
 
   # Limit variables
-  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth)
+  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth,
+                       stress,physical,poverty,anybad)
 
   # Rename
   hrs <- hrs |> rename('gender'='ragender',
                        'id'='hhidpn')
-
-  # Drop obs
-  hrs <- na.omit(hrs)
 
 
 ### Saving #####################################################################
