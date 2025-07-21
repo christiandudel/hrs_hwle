@@ -2,11 +2,6 @@
 
   library(dtms)
   library(tidyverse)
-
-
-### Load Packages ##############################################################
-
-  library(tidyverse)
   library(readstata13)
 
 
@@ -186,17 +181,11 @@
   men2020 <- estdata |> filter(gender ==1 & wave==14)
   women2020 <- estdata |> filter(gender==2 & wave==14)
 
-    
-### General settings ###########################################################
-  
-  # DTMS for prediction
-  hrspredict <- dtms(transient=transient_states,
-                     absorbing="dead",
-                     timescale=seq(50,98,2))
-  
   
 ### Function for analysis ######################################################
   
+  # This is just a quick approximation, but should be fine for comparisons
+  # across years
   le <- function(data) {
     
     # Outcome
