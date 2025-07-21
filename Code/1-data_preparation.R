@@ -45,7 +45,9 @@
                        # Current job involves lots of stress
                        starts_with("r")&ends_with("jstres"),
                        # Poverty
-                       starts_with("h")&ends_with("inpov")
+                       starts_with("h")&ends_with("inpov"),
+                       # Weights
+                       starts_with("r")&ends_with("wtresp")
                        )
 
 
@@ -230,11 +232,12 @@
 
   # Limit variables
   hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth,
-                       stress,physical,poverty,anybad)
+                       stress,physical,poverty,anybad,wtresp)
 
   # Rename
   hrs <- hrs |> rename('gender'='ragender',
-                       'id'='hhidpn')
+                       'id'='hhidpn',
+                       'weight'='wtresp')
 
 
 ### Saving #####################################################################

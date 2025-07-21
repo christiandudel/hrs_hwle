@@ -27,7 +27,7 @@
 ### Reshape and edit data some more ############################################    
 
   # Reshape 
-  estdata <- hrs |> select(id,gender,race,education,wave,age,stateboth) |> 
+  estdata <- hrs |> select(id,gender,race,education,wave,age,stateboth,weight) |> 
                     dtms_format(data=_,
                     dtms=hrsdtms,
                     idvar="id",
