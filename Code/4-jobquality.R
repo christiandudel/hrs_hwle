@@ -33,7 +33,7 @@
   regdat$gender <- as.factor(regdat$gender)
   regdat$stateboth <- as.factor(regdat$stateboth)
   
-  # Needs to adjust for health
+  # Regression models
   physical_logit <- glm(physical ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
                         family=binomial,
                         data=regdat)
@@ -46,6 +46,12 @@
                        family=binomial,
                        data=regdat)
   
+  # Random effects example, does unfortunately not converge
+  # library(lme4)
+  # physical_logit <- glmer(physical ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth + (1|id),
+  #                         family=binomial(),
+  #                         data=regdat)
+
   # Data frame for prediction
   regpre <- expand.grid(gender=c(1,2),
                         race=c("Black","Hispan","White"),
