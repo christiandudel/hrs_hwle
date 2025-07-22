@@ -16,7 +16,7 @@
   transient_states <- c("retired/healthy","retired/unhealthy",
                         "not working",
                         "working/healthy","working/unhealthy")
-
+  
   # Note: variable step length
   hrsdtms <- dtms(transient=transient_states,
                   absorbing="dead",
@@ -28,13 +28,13 @@
 
   # Reshape 
   estdata <- hrs |> select(id,gender,race,education,wave,age,stateboth,weight) |> 
-                    dtms_format(data=_,
-                    dtms=hrsdtms,
-                    idvar="id",
-                    timevar="age",
-                    statevar="stateboth",
-                    steplength=TRUE)
-
+    dtms_format(data=_,
+                dtms=hrsdtms,
+                idvar="id",
+                timevar="age",
+                statevar="stateboth",
+                steplength=TRUE)
+  
   # Clean
   estdata <- dtms_clean(data=estdata,dtms=hrsdtms)
   
@@ -45,7 +45,7 @@
   estdata$time2 <- estdata$time^2
   estdata$education <- as.factor(estdata$education)
   estdata$race <- as.factor(estdata$race)
-  
+
 
 ### Subsets by gender ##########################################################
 
@@ -57,70 +57,6 @@
   # the starting wave and wave 15 is implied)
   men2020 <- men |> filter(wave!=14)
   women2020 <- women |> filter(wave!=14)
-
-
-### Sample size ################################################################
-
-  # No of transitions
-  dim(men)[1]+dim(women)[1]
-  
-  # No of individuals
-  nmen <- men |> pull(id) |> unique() |> length()
-  nwomen <- women |> pull(id) |> unique() |> length()
-  nmen+nwomen
-  
-
-### Descriptives ###############################################################
-  
-  # Sample composition: Individuals
-  individuals <- estdata |> group_by(id)|> filter(time == min(time))
-  
-  # Average age in first wave
-  mean(individuals$time)
-  
-  # Table with overall descriptives for individuals
-  table_individuals <- data.frame(Variable=c(rep("Gender",2),
-                                  rep("Race/ethnicity",3),
-                                  rep("Education",3)))
-  
-  table_individuals$Value <- c("Men","Women",
-                               "White","Black","Hispanic",
-                               "Less than HS","HS","College or university")
-  
-  table1 <- table(individuals$gender)
-  table2 <- table(factor(individuals$race,levels=c("White","Black","Hispan")))
-  table3 <- table(individuals$education)
-  
-  table_individuals$Observations <- c(table1,table2,table3)
-  table_individuals$Relative <- c(table1/sum(table1),table2/sum(table2),table3/sum(table3))
-  
-  write_xlsx(table_individuals, "Results/table_individuals.xlsx")
-  
-  # Table combined characteristics observations and by time
-  estdata <- estdata |> mutate(Period=NA,
-                               Period=ifelse(wave%in%2:8,1,Period),
-                               Period=ifelse(wave%in%9:15,2,Period))
-  
-  table_observations <- estdata |> group_by(gender,Period,race,education) |> summarize(Count=n())
-
-  table_observations$Period <- factor(table_observations$Period,levels=c(1,2),labels=c("1994-2006","2008-2020"))
-  table_observations$gender <- factor(table_observations$gender,levels=c(1,2),labels=c("Men","Women"))
-  table_observations$race <- factor(table_observations$race,levels=c("White","Black","Hispan"),labels=c("White","Black","Hispanic"))
-  table_observations$education <- factor(table_observations$education,levels=c(0,1,2),labels=c("Low","Medium","High"))
-
-  names(table_observations) <- c("Gender","Period","Race","Education","N")
-  
-  table_observations <-  arrange(table_observations,Gender,Period,Race,Education)
-  totals <- table_observations |> group_by(Period,Gender) |> summarize(P=sum(N))
-  
-  table_observations <- table_observations |> left_join(totals)
-  tabke_observations <- table_observations |> mutate(P=N/P)
-  
-  write_xlsx(tabke_observations, "Results/table_observations.xlsx")
-
-  # Transitions: absolute, relative, raw transition probability
-  table_transitions <- summary(estdata)
-  write_xlsx(table_transitions, "Results/table_transitions.xlsx")
 
 
 ### General settings ###########################################################
@@ -187,7 +123,7 @@
     # Model
     fit1 <- dtms_fit(data=first,controls=controls,package="mclogit")
     fit2 <- dtms_fit(data=secon,controls=controls,package="mclogit")
-  
+    
     # Predict probabilities
     probs1_low_w <- dtms_transitions(dtms=dtms,model=fit1,controls=low_w,se=F)
     probs1_med_w <- dtms_transitions(dtms=dtms,model=fit1,controls=med_w,se=F)
@@ -200,7 +136,7 @@
     probs1_low_h <- dtms_transitions(dtms=dtms,model=fit1,controls=low_h,se=F)
     probs1_med_h <- dtms_transitions(dtms=dtms,model=fit1,controls=med_h,se=F)
     probs1_hig_h <- dtms_transitions(dtms=dtms,model=fit1,controls=hig_h,se=F)
-  
+    
     probs2_low_w <- dtms_transitions(dtms=dtms,model=fit2,controls=low_w,se=F)
     probs2_med_w <- dtms_transitions(dtms=dtms,model=fit2,controls=med_w,se=F)
     probs2_hig_w <- dtms_transitions(dtms=dtms,model=fit2,controls=hig_w,se=F)
@@ -250,7 +186,7 @@
     S1_low_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("Hispan",levels=levels(data$race))))
     S1_med_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("Hispan",levels=levels(data$race))))
     S1_hig_h <- dtms_start(dtms=dtms,data=first,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("Hispan",levels=levels(data$race))))
-  
+    
     S2_low_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("0",levels=c("0","1","2")),race=factor("White",levels=levels(data$race))))
     S2_med_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("1",levels=c("0","1","2")),race=factor("White",levels=levels(data$race))))
     S2_hig_w <- dtms_start(dtms=dtms,data=secon,start_time=c(50:56),variables=list(education=factor("2",levels=c("0","1","2")),race=factor("White",levels=levels(data$race))))
@@ -293,14 +229,14 @@
       data.frame(period=2,education=0,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_low_h,start_distr=S2_low_h))["AVERAGE",],
       data.frame(period=2,education=1,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_med_h,start_distr=S2_med_h))["AVERAGE",],
       data.frame(period=2,education=2,race=2,dtms_expectancy(dtms=dtms,matrix=Tm2_hig_h,start_distr=S2_hig_h))["AVERAGE",]
-      )
-  
+    )
+    
     # Rownames for now
     rownames(resexp) <- 1:dim(resexp)[1]
     
     # Type
     resexp <- as.matrix(resexp)
-  
+    
     # Return
     return(resexp)
     
@@ -312,16 +248,16 @@
   men_res <- bootfun(data=men,dtms=hrspredict)
   women_res <- bootfun(data=women,dtms=hrspredict)
 
-  
+
 ### Robustness check: Without 2020 #############################################
-  
+
   # Results without 2020
   men2020_res <- bootfun(data=men2020,dtms=hrspredict)
   women2020_res <- bootfun(data=women2020,dtms=hrspredict)
   
   # Difference to original results
   mendiff_res <- men_res[men_res[,1]==2,-(1:3)] - 
-                 men2020_res[men2020_res[,1]==2,-(1:3)] 
+    men2020_res[men2020_res[,1]==2,-(1:3)] 
   
   womendiff_res <- women_res[women_res[,1]==2,-(1:3)] - 
     women2020_res[women2020_res[,1]==2,-(1:3)] 
@@ -331,10 +267,10 @@
   diff_2020 <- cbind(men_res[,1:3],diff_2020)
   colnames(diff_2020)[1] <- "gender"
   diff_2020 <- as.data.frame(diff_2020)
-  
+
 
 ### Bootstrap ##################################################################  
-  
+
   men_boot <- dtms_boot(data=men,
                         fun=bootfun,
                         dtms=hrspredict,
@@ -369,74 +305,10 @@
   men_boot <- summary(men_boot)
   women_boot <- summary(women_boot)
 
-  
-### Analysis of phyiscal, stress, poverty ######################################
-  
-  # Descriptive 
-  quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave%in%9:15) |> 
-                  group_by(gender,race,education) |> 
-                  summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
-  
-  quality_wh <- hrs |> filter(stateboth=="working/healthy" & wave%in%9:15) |> 
-                  group_by(gender,race,education) |> 
-                  summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
-  
-  # Get data right for regression, only recent waves
-  regdat <- hrs |> filter(wave%in%9:15 & 
-                          race!="Other" &
-                          stateboth %in% c("working/healthy","working/unhealthy"))
-  
-  # Edit variables a bit
-  regdat$age2 <- regdat$age^2
-  regdat$race <- as.factor(regdat$race)
-  regdat$education <- as.factor(regdat$education)
-  regdat$gender <- as.factor(regdat$gender)
-  regdat$stateboth <- as.factor(regdat$stateboth)
-  
-  # Needs to adjust for health
-  physical_logit <- glm(physical ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
-                        family=binomial,
-                        data=regdat)
-  
-  stress_logit <- glm(stress ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
-                      family=binomial,
-                      data=regdat)
-  
-  poverty_logit <- glm(poverty ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
-                       family=binomial,
-                       data=regdat)
-  
-  # Data frame for prediction
-  regpre <- expand.grid(gender=c(1,2),
-                        race=c("Black","Hispan","White"),
-                        education=0:2,
-                        stateboth=levels(regdat$stateboth),
-                        age=63,
-                        age2=63^2)
-  
-  regpre$race <- as.factor(regpre$race)
-  regpre$education <- as.factor(regpre$education)
-  regpre$gender <- as.factor(regpre$gender)
-  regpre$stateboth <- as.factor(regpre$stateboth)
-  
-  # Predict outcomes
-  regpre$physical <- predict(physical_logit,regpre,type="response")
-  regpre$stress <- predict(stress_logit,regpre,type="response")
-  regpre$poverty <- predict(poverty_logit,regpre,type="response")
-  
-  # Format results
-  tmp1 <- regpre |> filter(stateboth=="working/unhealthy")
-  tmp2 <- regpre |> filter(stateboth=="working/healthy")
-  riskratio <- tmp1[,7:9]/tmp2[,7:9]
-  names(riskratio) <- paste0("rr_",names(riskratio))
-  quality <- tmp1 |> select(gender,race,education,physical,stress,poverty)
-  quality <- cbind(quality,riskratio)
-  
-  
+
 ### Save results ###############################################################
 
-  save(list=c("men_res","women_res","men_boot","women_boot","diff_2020",
-              "quality"),
+  save(list=c("men_res","women_res","men_boot","women_boot","diff_2020"),
        file="Results/results.Rda")
   
   # For saving as Excel
@@ -448,11 +320,10 @@
   
   menlist[[3]]$race <- menlist[[2]]$race <- menlist[[1]]$race
   womenlist[[3]]$race <- womenlist[[2]]$race <- womenlist[[1]]$race
-
+  
   write_xlsx(menlist, "Results/results_men.xlsx")
   write_xlsx(womenlist, "Results/results_women.xlsx")
   write_xlsx(diff_2020,"Results/without_2020.xlsx")
-  write_xlsx(quality,"Results/quality.xlsx")
   
   # If running on workstation
   if(Sys.info()["nodename"]%in%c("HYDRA01","HYDRA02","HYDRA11")) {rm(list=ls());gc()}
