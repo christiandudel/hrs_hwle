@@ -46,6 +46,10 @@
                        family=binomial,
                        data=regdat)
   
+  anybad_logit <- glm(anybad ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
+                       family=binomial,
+                       data=regdat)
+  
   # Random effects example, does unfortunately not converge
   # library(lme4)
   # physical_logit <- glmer(physical ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth + (1|id),
@@ -69,20 +73,21 @@
   regpre$physical <- predict(physical_logit,regpre,type="response")
   regpre$stress <- predict(stress_logit,regpre,type="response")
   regpre$poverty <- predict(poverty_logit,regpre,type="response")
+  regpre$anybad <- predict(anybad_logit,regpre,type="response")
   
   # Format results
   tmp1 <- regpre |> filter(stateboth=="working/unhealthy")
   tmp2 <- regpre |> filter(stateboth=="working/healthy")
-  riskratio <- tmp1[,7:9]/tmp2[,7:9]
+  riskratio <- tmp1[,7:10]/tmp2[,7:10]
   names(riskratio) <- paste0("rr_",names(riskratio))
-  quality <- tmp1 |> select(gender,race,education,physical,stress,poverty)
+  quality <- tmp1 |> select(gender,race,education,physical,stress,poverty,anybad)
   quality <- cbind(quality,riskratio)
   
   
 ### Bootstrap ##################################################################
   
   # Number of replications
-  replications <- 500
+  replications <- 1000
   
   # For results
   bootresults <- list()
@@ -120,15 +125,20 @@
                          family=binomial,
                          data=tmpdat)
     
+    anybad_logit <- glm(anybad ~ gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
+                        family=binomial,
+                        data=tmpdat)
+    
     # Predict outcomes
     regpre$physical <- predict(physical_logit,regpre,type="response")
     regpre$stress <- predict(stress_logit,regpre,type="response")
     regpre$poverty <- predict(poverty_logit,regpre,type="response")
+    regpre$anybad <- predict(anybad_logit,regpre,type="response")
     
     # Format results
     tmp1 <- regpre |> filter(stateboth=="working/unhealthy")
     tmp2 <- regpre |> filter(stateboth=="working/healthy")
-    tmpratio <- tmp1[,7:9]/tmp2[,7:9]
+    tmpratio <- tmp1[,7:10]/tmp2[,7:10]
     
     # Result
     bootresults[[rep]] <- tmpratio
@@ -156,8 +166,8 @@
 ### Save results ###############################################################
   
   # Combine with bootstrap
-  colnames(lowratio) <- c("rr_physical_95low","rr_stress_95low","rr_poverty_95low")
-  colnames(higratio) <- c("rr_physical_95up","rr_stress_95up","rr_poverty_95up")
+  colnames(lowratio) <- c("rr_physical_95low","rr_stress_95low","rr_poverty_95low","rr_anybad_95low")
+  colnames(higratio) <- c("rr_physical_95up","rr_stress_95up","rr_poverty_95up","rr_anybad_95up")
   quality <- cbind(quality,lowratio,higratio)
 
   # Save  
