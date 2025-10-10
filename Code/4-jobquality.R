@@ -172,3 +172,31 @@
 
   # Save  
   write_xlsx(quality,"Results/quality.xlsx")
+  
+  
+### Preliminary ################################################################
+  
+  # Are poor workers at higher risk of stress and strain?
+  physical_pov <- glm(physical ~ poverty + poverty*gender + poverty*race + poverty*education + gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
+                        family=binomial,
+                        data=regdat)
+  
+  stress_pov <- glm(stress ~ poverty + poverty*gender + poverty*race + poverty*education + gender*race + gender*education + race*education + gender*age + gender*age2 + gender*stateboth,
+                      family=binomial,
+                    data=regdat)
+  
+  # Predict
+  regpre_poor <- regpre_non <- regpre
+  regpre_poor$poverty <- 1
+  regpre_non$poverty <- 0
+  
+  regpre_poor$physical <- predict(physical_pov,regpre_poor,type="response")
+  regpre_poor$stress <- predict(stress_pov,regpre_poor,type="response")
+  
+  regpre_non$physical <- predict(physical_pov,regpre_non,type="response")
+  regpre_non$stress <- predict(stress_pov,regpre_non,type="response")
+  
+  # Quick look
+  regpre_poor$physical-regpre_non$physical # Always higher for poor people
+  regpre_poor$stress-regpre_non$stress # Always lower
+  
