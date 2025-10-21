@@ -69,6 +69,8 @@
   
   
   # Drop if education is missing (22 individuals, negligible)
+  dim(hrs)
+  hrs |> filter(is.na(education) | is.na(race)) |> count()
   hrs <- hrs |> filter(!is.na(education) & !is.na(race))
 
 
@@ -195,6 +197,10 @@
                        workboth=ifelse(worksimple%in%"retired" & both%in%0,"retired/healthy",workboth),
                        workboth=ifelse(worksimple%in%"retired" & both%in%1,"retired/unhealthy",workboth),
                        workboth=ifelse(worksimple%in%"not working" & !is.na(both) ,"not working",workboth))
+  
+  # Missing person-years
+  table(hrs$stateboth,useNA="always") |> prop.table()
+  
 
 ### State variables (including death) ##########################################
   
