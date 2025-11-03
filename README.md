@@ -13,9 +13,10 @@ available here: https://github.com/christiandudel/dtms
 
 ## Folders and files
 
-Currently, on GitHub there are two folders: Code and Results. However, to run
+Currently, on GitHub there are two folders: Code and Results. Running
 the code requires adding a third folder called Data which contains the RAND-HRS
-file. The folder Code contains two files. One file for data preparation and one file
-which does most of the analysis; the latter also exports a few results which
-are stored in the folder Results. Both code files come with extensive comments.
+file. The folder Code contains three files. One file for data preparation, one 
+file for the descriptive analysis, and one file which does the multistate 
+analysis; the latter two export a few results which
+are stored in the folder Results. 
 
